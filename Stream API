@@ -1,0 +1,468 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Stream API: The Enterprise Architecture & Engineering Master Reference</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #f1f3f5;
+    --text-primary: #212529;
+    --text-secondary: #495057;
+    --text-muted: #6c757d;
+    --accent-color: #0b7285;
+    --accent-hover: #085966;
+    --border-color: #dee2e6;
+    --code-bg: #1e1e1e;
+    --code-text: #d4d4d4;
+    --callout-info-bg: #e7f5ff;
+    --callout-info-border: #1c7ed6;
+    --callout-warn-bg: #fff9db;
+    --callout-warn-border: #f59f00;
+    --callout-danger-bg: #ffe3e3;
+    --callout-danger-border: #f03e3e;
+    --callout-success-bg: #e6fcf5;
+    --callout-success-border: #0ca678;
+    --sidebar-width: 320px;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Sidebar TOC */
+  #sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    padding: 1.5rem 1rem;
+    font-size: 0.875rem;
+    z-index: 100;
+  }
+  #sidebar h2 {
+    font-size: 1.1rem;
+    margin-top: 0;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  #sidebar ul { list-style: none; padding-left: 0; margin: 0; }
+  #sidebar li { margin-bottom: 0.5rem; }
+  #sidebar a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+    display: block;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+  }
+  #sidebar a:hover {
+    color: var(--accent-color);
+    background-color: var(--bg-tertiary);
+  }
+  #sidebar ul ul {
+    padding-left: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Main Content Layout */
+  #main-content {
+    margin-left: var(--sidebar-width);
+    padding: 2.5rem 3.5rem;
+    max-width: 1400px;
+  }
+
+  header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  header h1 {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin: 0 0 0.5rem 0;
+  }
+  header .meta {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.4rem;
+    margin-top: 3rem;
+  }
+  h3 { font-size: 1.35rem; color: var(--accent-color); margin-top: 2rem; }
+  h4 { font-size: 1.1rem; color: var(--text-secondary); margin-top: 1.5rem; }
+
+  p, li { color: var(--text-secondary); }
+  ul, ol { padding-left: 1.5rem; }
+
+  /* Callout Boxes */
+  .callout {
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    border-left: 4px solid;
+    border-radius: 0 4px 4px 0;
+  }
+  .callout-info { background-color: var(--callout-info-bg); border-color: var(--callout-info-border); }
+  .callout-warn { background-color: var(--callout-warn-bg); border-color: var(--callout-warn-border); }
+  .callout-danger { background-color: var(--callout-danger-bg); border-color: var(--callout-danger-border); }
+  .callout-success { background-color: var(--callout-success-bg); border-color: var(--callout-success-border); }
+  .callout-title { font-weight: bold; margin-bottom: 0.25rem; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.925rem;
+  }
+  th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border: 1px solid var(--border-color);
+  }
+  th {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  tr:nth-child(even) { background-color: var(--bg-secondary); }
+
+  /* Code Blocks */
+  pre {
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    padding: 1.25rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    background-color: var(--bg-tertiary);
+    color: #c7254e;
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.875rem;
+  }
+  pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  /* Listen For Box */
+  .listen-for {
+    background-color: #f3f0ff;
+    border-left: 4px solid #7950f2;
+    padding: 0.85rem 1.15rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    border-radius: 0 4px 4px 0;
+  }
+  .listen-for strong { color: #5f3dc4; }
+
+  /* Diagram Box */
+  .diagram {
+    background-color: #1a1a1a;
+    color: #00ff66;
+    font-family: monospace;
+    padding: 1rem;
+    border-radius: 6px;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.2;
+    margin: 1.5rem 0;
+  }
+
+  @media (max-width: 1024px) {
+    #sidebar { display: none; }
+    #main-content { margin-left: 0; padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>Table of Contents</h2>
+  <ul>
+    <li><a href="#sec-1">1. Executive Summary</a></li>
+    <li><a href="#sec-2">2. Fundamentals & Architecture</a></li>
+    <li><a href="#sec-3">3. Deep Internal Mechanics</a></li>
+    <li><a href="#sec-4">4. Worked Examples</a></li>
+    <li><a href="#sec-5">5. Advanced Concepts</a></li>
+    <li><a href="#sec-6">6. Performance & Tuning</a></li>
+    <li><a href="#sec-7">7. Observability & Troubleshooting</a></li>
+    <li><a href="#sec-8">8. Migration & Upgrade Guidance</a></li>
+    <li><a href="#sec-9">9. Best Practices</a></li>
+    <li><a href="#sec-10">10. Anti-Patterns</a></li>
+    <li><a href="#sec-11">11. Interview Q&A (Basic to Architect)</a></li>
+    <li><a href="#sec-12">12. Scenario-Based Architect Discussions</a></li>
+    <li><a href="#sec-13">13. Quick Reference & Cheat Sheets</a></li>
+  </ul>
+</div>
+
+<div id="main-content">
+
+<header>
+  <h1>Java Stream API: The Enterprise Architecture & Technical Reference Guide</h1>
+  <div class="meta">
+    <strong>Target Audience:</strong> Staff Engineers, Principal Architects, Lead Developers | <strong>Language Focus:</strong> Java 8 to Java 21+
+  </div>
+</header>
+
+<!-- SECTION 1 -->
+<section id="sec-1">
+  <h2>1. Executive Summary</h2>
+  <p>
+    Introduced in Java 8, the <code>java.util.stream</code> package fundamentally shifted Java from an imperative, external-iteration model to a declarative, internal-iteration model. At its core, a Stream is a high-level abstraction representing a sequence of elements that supports sequential and parallel aggregate operations. It is <strong>not</strong> a data structure; it stores no elements, does not modify its underlying source, and cannot be reused once consumed.
+  </p>
+  
+  <h3>Enterprise Value Proposition</h3>
+  <ul>
+    <li><strong>Declarative Data Transformation:</strong> Expresses <em>what</em> needs to be accomplished rather than <em>how</em> to iterate, reducing boiler-plate loop mechanics and index-off-by-one errors.</li>
+    <li><strong>Lazy Evaluation & Query Optimization:</strong> Stream pipelines defer evaluation until a terminal operation is invoked. Intermediate operations are fused into a single pass, enabling short-circuiting and minimizing redundant memory passes over large datasets.</li>
+    <li><strong>Transparent Parallelization:</strong> Abstraxts multi-core parallel execution via the <code>ForkJoinPool.commonPool()</code> framework without forcing developers to manually write thread synchronization, data partitioning, or task join code.</li>
+  </ul>
+
+  <h3>Common Enterprise Misconceptions & Misuse</h3>
+  <div class="callout callout-danger">
+    <div class="callout-title">Production Warning: High-Throughput Overhead</div>
+    Using Streams everywhere blindly is an anti-pattern. Streams incur non-trivial allocation costs (pipeline objects, sink wrappers, lambda captures) and CPU overhead compared to simple primitive <code>for</code> loops. In ultra-low-latency paths (e.g., high-frequency trading or hot-path API routing), streams can trigger severe Garbage Collection pauses and lower throughput due to cache-misses and heap allocation overhead.
+  </div>
+  <ul>
+    <li><strong>Stream $\neq$ Collection:</strong> A Stream is a compute pipeline, not an in-memory data bucket.</li>
+    <li><strong>Parallel Streams are not a Silver Bullet for I/O:</strong> Using parallel streams for high-latency external HTTP calls or database queries defaults to the shared <code>ForkJoinPool.commonPool()</code>, causing global thread pool starvation across the entire JVM process.</li>
+  </ul>
+</section>
+
+<!-- SECTION 2 -->
+<section id="sec-2">
+  <h2>2. Fundamentals & Architecture</h2>
+  
+  <h3>Core Concepts from First Principles</h3>
+  <p>
+    A Stream pipeline consists of three distinct phases:
+  </p>
+  <ol>
+    <li><strong>Source:</strong> Collections, Arrays, I/O Channels, Generator Functions, or Primitive Ranges.</li>
+    <li><strong>Intermediate Operations (Zero or More):</strong> Operations like <code>map()</code>, <code>filter()</code>, <code>flatMap()</code>, <code>sorted()</code>. These operations transform a stream into another stream and are strictly <em>lazy</em>.</li>
+    <li><strong>Terminal Operation (Exactly One):</strong> Operations like <code>collect()</code>, <code>reduce()</code>, <code>forEach()</code>, <code>findFirst()</code>. The terminal operation triggers pipeline evaluation, consumes the stream, and yields a result or side-effect.</li>
+  </ol>
+
+  <h3>Stream vs Collection Mechanics</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Collection (e.g., <code>List</code>, <code>Set</code>)</th>
+        <th>Stream (<code>java.util.stream.Stream</code>)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Data Storage</strong></td>
+        <td>In-memory data structure holding explicit data elements.</td>
+        <td>No physical storage. Computes elements on demand from a source.</td>
+      </tr>
+      <tr>
+        <td><strong>Iteration Model</strong></td>
+        <td>External Iteration (Explicit <code>for</code>, <code>Iterator</code> loops).</td>
+        <td>Internal Iteration (The pipeline controls traversal).</td>
+      </tr>
+      <tr>
+        <td><strong>Evaluation Timing</strong></td>
+        <td>Eagerly constructed (All elements reside in memory).</td>
+        <td>Lazy evaluation (Evaluated only upon terminal execution).</td>
+      </tr>
+      <tr>
+        <td><strong>Reusability</strong></td>
+        <td>Can be traversed and mutated infinite times.</td>
+        <td>Single-use object. Throws <code>IllegalStateException</code> if reused.</td>
+      </tr>
+      <tr>
+        <td><strong>Infinite Sequences</strong></td>
+        <td>Impossible (Requires infinite memory).</td>
+        <td>Supported via generators (e.g., <code>Stream.iterate()</code>, <code>Stream.generate()</code>).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Internal Architecture Architecture Diagram</h3>
+  <div class="diagram">
++-----------------------------------------------------------------------------------+
+|                                  STREAM PIPELINE                                  |
++-----------------------------------------------------------------------------------+
+|                                                                                   |
+|  [Source: List<T>] ----> Spliterator.tryAdvance() / forEachRemaining()             |
+|                               |                                                   |
+|                               v                                                   |
+|                   +-----------------------+                                       |
+|                   | Head (Pipeline Stage) |                                       |
+|                   +-----------------------+                                       |
+|                               |                                                   |
+|                               v                                                   |
+|                   +-----------------------+                                       |
+|                   | StatelessOp (filter)  |  <-- Injects/Clears Flags             |
+|                   +-----------------------+                                       |
+|                               |                                                   |
+|                               v                                                   |
+|                   +-----------------------+                                       |
+|                   | StatefulOp (sorted)   |  <-- Requires full pass / buffering  |
+|                   +-----------------------+                                       |
+|                               |                                                   |
+|                               v                                                   |
+|                   +-----------------------+                                       |
+|                   | TerminalOp (collect)  |  <-- Initiates Sink Chain Push        |
+|                   +-----------------------+                                       |
+|                                                                                   |
++-----------------------------------------------------------------------------------+
+  </div>
+
+  <h3>Stream Pipeline Lifecycle</h3>
+  <p>
+    When a developer writes a stream chain, Java constructs a doubly linked list of pipeline stages extending <code>AbstractPipeline</code>.
+  </p>
+  <pre><code>// Construction Phase (No execution occurs)
+Stream&lt;String&gt; stream = list.stream()           // Creates Head pipeline stage
+    .filter(s -&gt; s.startsWith("A"))             // Wraps Head in StatelessOp stage
+    .map(String::toUpperCase);                  // Wraps Filter stage in StatelessOp stage
+
+// Terminal Phase (Pipeline execution begins)
+List&lt;String&gt; result = stream.collect(Collectors.toList()); // Triggers Sink chain construction & traversal
+</code></pre>
+</section>
+
+<!-- SECTION 3 -->
+<section id="sec-3">
+  <h2>3. Deep Internal Mechanics</h2>
+
+  <h3>1. AbstractPipeline, ReferencePipeline, and Sink Chains</h3>
+  <p>
+    Internally, streams are managed via internal JDK classes: <code>AbstractPipeline</code> and its subclasses <code>ReferencePipeline</code> (for object streams) and <code>IntPipeline</code>, <code>LongPipeline</code>, <code>DoublePipeline</code> (for primitive specialization).
+  </p>
+  <p>
+    Execution is driven by the <strong><code>Sink&lt;T&gt;</code> interface</strong>. A <code>Sink</code> is a consumer-like interface that receives elements down the stream chain. It contains four core lifecycle operations:
+  </p>
+  <ul>
+    <li><code>begin(long size)</code>: Notifies the sink that data is incoming, allowing pre-allocation of buffer sizes.</li>
+    <li><code>accept(T t)</code>: Pushes a single data element downstream.</li>
+    <li><code>cancellationRequested()</code>: Used by short-circuiting operations (e.g., <code>findFirst</code>, <code>anyMatch</code>) to halt upstream processing.</li>
+    <li><code>end()</code>: Signals completion of evaluation. Used by stateful operations (like <code>sorted</code>) to finalize sorting and push buffered results downstream.</li>
+  </ul>
+
+  <div class="callout callout-info">
+    <div class="callout-title">Sink Fusing Mechanism</div>
+    When a terminal operation executes, the JDK builds a downstream chain of <code>Sink</code> objects in reverse order (from Terminal Op back to Head). As elements are pulled from the <code>Spliterator</code>, they are pushed through the linked <code>Sink.accept()</code> methods without intermediate collection allocations between stages.
+  </div>
+
+  <h3>2. Stream Flags (StreamOpFlag)</h3>
+  <p>
+    The stream framework relies heavily on bitwise flags (<code>StreamOpFlag</code>) to optimize execution paths based on source characteristics and prior intermediate operations.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Flag Name</th>
+        <th>Description</th>
+        <th>Optimization Impact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>SIZED</code></td>
+        <td>Exact size of stream is known.</td>
+        <td>Allows collectors (e.g., <code>toList()</code>) to pre-size backing arrays, eliminating dynamic array reallocations.</td>
+      </tr>
+      <tr>
+        <td><code>DISTINCT</code></td>
+        <td>Elements are guaranteed distinct.</td>
+        <td>Causes subsequent <code>distinct()</code> calls to become no-ops.</td>
+      </tr>
+      <tr>
+        <td><code>SORTED</code></td>
+        <td>Elements are sorted in natural or comparator order.</td>
+        <td>Causes subsequent <code>sorted()</code> operations to be bypassed entirely.</td>
+      </tr>
+      <tr>
+        <td><code>ORDERED</code></td>
+        <td>Enforces a strict encounter order.</td>
+        <td>Disables aggressive parallel optimizations. Calling <code>unordered()</code> clears this flag to increase multi-threaded performance.</td>
+      </tr>
+      <tr>
+        <td><code>SHORT_CIRCUIT</code></td>
+        <td>Operation may terminate before processing all inputs.</td>
+        <td>Informs execution framework that processing can cease early (e.g., <code>limit()</code>, <code>anyMatch()</code>).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3. Spliterator Architecture</h3>
+  <p>
+    The <code>Spliterator</code> (Splitting Iterator) is the fundamental primitive backing all Streams. It enables sequential and parallel traversal over data sources.
+  </p>
+  <pre><code>public interface Spliterator&lt;T&gt; {
+    boolean tryAdvance(Consumer&lt;? super T&gt; action);
+    void forEachRemaining(Consumer&lt;? super T&gt; action);
+    Spliterator&lt;T&gt; trySplit();
+    long estimateSize();
+    int characteristics();
+}
+</code></pre>
+  <ul>
+    <li><code>tryAdvance()</code>: Processes a single element. Returns <code>true</code> if elements remain, <code>false</code> if exhausted.</li>
+    <li><code>trySplit()</code>: The key to parallel processing. Splits the current source into two independent <code>Spliterator</code> instances. If the source cannot be split, it returns <code>null</code>.</li>
+  </ul>
+
+  <h3>4. Parallel Stream Engine & ForkJoinPool</h3>
+  <p>
+    When <code>parallelStream()</code> or <code>.parallel()</code> is invoked, execution switches from single-threaded sink execution to a task-decomposing <code>CountedCompleter</code> framework executing within <code>ForkJoinPool.commonPool()</code>.
+  </p>
+  <div class="diagram">
+Parallel Stream Split & Steal Lifecycle:
+
+                  [ Root Spliterator ]
+                           |
+                  .trySplit() (Recursive)
+                 /                   \
+        [ Sub-Spliterator A ]     [ Sub-Spliterator B ]
+              /       \                 /       \
+          [Task 1]  [Task 2]        [Task 3]  [Task 4]
+             |         |               |         |
+             v         v               v         v
+     --------------------------------------------------
+               ForkJoinPool Workers (Work-Stealing)
+     --------------------------------------------------
+  </div>
+</section>
+
+<!-- SECTION 4 -->
+<section id="sec-4">
+  <h2>4. Worked Examples</h2>
+
+  <h3>1. Production-Grade Example: Custom Spliterator, Custom Collector, and Circuit Breaking</h3>
+  <p>
+    Below is a full enterprise-grade example demonstrating a custom <code>Spliterator</code> that parses fixed-length streaming log records from a byte buffer, processes them in parallel, handles circuit breaking upon encountering toxic corrupt records, and collects results using a custom concurrent accumulator.
+  </p>
+
+  <pre><code>package com.ent
